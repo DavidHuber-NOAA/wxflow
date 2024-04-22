@@ -6,8 +6,8 @@ from typing import Dict, List, Union
 import jinja2
 from markupsafe import Markup
 
-from .timetools import (strftime, to_fv3time, to_isotime, to_julian, to_YMD,
-                        to_YMDH)
+from .timetools import (add_to_datetime, strftime, to_fv3time, to_isotime,
+                        to_julian, to_timedelta, to_YMD, to_YMDH)
 
 __all__ = ['Jinja']
 
@@ -108,6 +108,8 @@ class Jinja:
         to_f90bool: convert a boolean to a fortran boolean
         relpath: convert a full path to a relative path based on an input root_path
         getenv: read variable from environment if defined, else UNDEFINED
+        to_timedelta: convert a string to a timedelta object
+        add_to_datetime: add time to a datetime, return new datetime object
 
         Parameters
         ----------
@@ -131,6 +133,8 @@ class Jinja:
         env.filters["to_f90bool"] = lambda bool: ".true." if bool else ".false."
         env.filters['getenv'] = lambda name, default='UNDEFINED': os.environ.get(name, default)
         env.filters["relpath"] = lambda pathname, start=os.curdir: os.path.relpath(pathname, start)
+        env.filters["add_to_datetime"] = lambda dt, delta: add_to_datetime(dt, delta) if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined)) else dt
+        env.filters["to_timedelta"] = lambda delta_str: to_timedelta(delta_str) if not isinstance(delta_str, SilentUndefined) else delta_str
 
         # Add any additional filters
         if filters is not None:
