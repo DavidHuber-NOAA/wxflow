@@ -133,7 +133,8 @@ class Jinja:
         env.filters["to_f90bool"] = lambda bool: ".true." if bool else ".false."
         env.filters['getenv'] = lambda name, default='UNDEFINED': os.environ.get(name, default)
         env.filters["relpath"] = lambda pathname, start=os.curdir: os.path.relpath(pathname, start)
-        env.filters["add_to_datetime"] = lambda dt, delta: add_to_datetime(dt, delta) if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined)) else dt
+        env.filters["add_to_datetime"] = (lambda dt, delta: add_to_datetime(dt, delta)
+                                          if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined)) else dt)
         env.filters["to_timedelta"] = lambda delta_str: to_timedelta(delta_str) if not isinstance(delta_str, SilentUndefined) else delta_str
 
         # Add any additional filters
