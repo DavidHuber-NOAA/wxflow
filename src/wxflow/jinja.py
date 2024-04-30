@@ -110,6 +110,16 @@ class Jinja:
         getenv: read variable from environment if defined, else UNDEFINED
         to_timedelta: convert a string to a timedelta object
         add_to_datetime: add time to a datetime, return new datetime object
+        template_substitute_structure: traverses a dictionary and substitutes
+            variables in fields, lists, and nested dictionaries
+
+        Additionally, the following TemplateConstants are passed into the
+        environment:
+        DOLLAR_CURLY_BRACE
+        DOLLAR_PARENTHESES
+        DOUBLE_CURLY_BRACES
+        AT_SQUARE_BRACES
+        AT_ANGLE_BRACKETS
 
         Parameters
         ----------
@@ -124,6 +134,12 @@ class Jinja:
         """
 
         env = jinja2.Environment(loader=loader, undefined=self.undefined)
+        env["DOLLAR_CURLY_BRACE"} = TemplateConstants.DOLLAR_CURLY_BRACE
+        env["DOLLAR_PARENTHESES"} = TemplateConstants.DOLLAR_PARENTHESES
+        env["DOUBLE_CURLY_BRACES"} = TemplateConstants.DOUBLE_CURLY_BRACES
+        env["AT_SQUARE_BRACES"} = TemplateConstants.AT_SQUARE_BRACES
+        env["AT_ANGLE_BRACKETS"} = TemplateConstants.AT_ANGLE_BRACKETS
+
         env.filters["strftime"] = lambda dt, fmt: strftime(dt, fmt)
         env.filters["to_isotime"] = lambda dt: to_isotime(dt) if not isinstance(dt, SilentUndefined) else dt
         env.filters["to_fv3time"] = lambda dt: to_fv3time(dt) if not isinstance(dt, SilentUndefined) else dt
@@ -133,9 +149,22 @@ class Jinja:
         env.filters["to_f90bool"] = lambda bool: ".true." if bool else ".false."
         env.filters['getenv'] = lambda name, default='UNDEFINED': os.environ.get(name, default)
         env.filters["relpath"] = lambda pathname, start=os.curdir: os.path.relpath(pathname, start)
-        env.filters["add_to_datetime"] = (lambda dt, delta: add_to_datetime(dt, delta)
-                                          if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined)) else dt)
+        env.filters["add_to_datetime"] = (
+                lambda dt, delta: add_to_datetime(dt, delta)
+                if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined))
+                else dt if isinstance(dt, SilentUndefined) else delta)
         env.filters["to_timedelta"] = lambda delta_str: to_timedelta(delta_str) if not isinstance(delta_str, SilentUndefined) else delta_str
+        env.filters["template_substitute_structure"] = (
+                lambda structure_to_substitute, var_type, get_value:
+                Template.substitute_structure(structure_to_substitute,
+                                              var_type,
+                                              get_value)
+                if not (isinstance(structure_to_substitute, SilentUndefined) or
+                        isinstance(var_type, SilentUndefined) or
+                        isinstance(get_value, SilentUndefined))
+                else structure_to_substitute if isinstance(structure_to_substitute, SlilentUndefined)
+                else var_type if isinstance(var_type, SilentUndefined)
+                else get_value)
 
         # Add any additional filters
         if filters is not None:
