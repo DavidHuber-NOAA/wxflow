@@ -6,6 +6,7 @@ from typing import Dict, List, Union
 import jinja2
 from markupsafe import Markup
 
+from .template import TemplateConstants
 from .timetools import (add_to_datetime, strftime, to_fv3time, to_isotime,
                         to_julian, to_timedelta, to_YMD, to_YMDH)
 
@@ -134,11 +135,11 @@ class Jinja:
         """
 
         env = jinja2.Environment(loader=loader, undefined=self.undefined)
-        env["DOLLAR_CURLY_BRACE"} = TemplateConstants.DOLLAR_CURLY_BRACE
-        env["DOLLAR_PARENTHESES"} = TemplateConstants.DOLLAR_PARENTHESES
-        env["DOUBLE_CURLY_BRACES"} = TemplateConstants.DOUBLE_CURLY_BRACES
-        env["AT_SQUARE_BRACES"} = TemplateConstants.AT_SQUARE_BRACES
-        env["AT_ANGLE_BRACKETS"} = TemplateConstants.AT_ANGLE_BRACKETS
+        env.extend(DOLLAR_CURLY_BRACE=TemplateConstants.DOLLAR_CURLY_BRACE,
+                   DOLLAR_PARENTHESES=TemplateConstants.DOLLAR_PARENTHESES,
+                   DOUBLE_CURLY_BRACES=TemplateConstants.DOUBLE_CURLY_BRACES,
+                   AT_SQUARE_BRACES=TemplateConstants.AT_SQUARE_BRACES,
+                   AT_ANGLE_BRACKETS=TemplateConstants.AT_ANGLE_BRACKETS)
 
         env.filters["strftime"] = lambda dt, fmt: strftime(dt, fmt)
         env.filters["to_isotime"] = lambda dt: to_isotime(dt) if not isinstance(dt, SilentUndefined) else dt
