@@ -6,7 +6,7 @@ from typing import Dict, List, Union
 import jinja2
 from markupsafe import Markup
 
-from .template import TemplateConstants
+from .template import TemplateConstants, Template
 from .timetools import (add_to_datetime, strftime, to_fv3time, to_isotime,
                         to_julian, to_timedelta, to_YMD, to_YMDH)
 
@@ -114,6 +114,11 @@ class Jinja:
         template_substitute_structure: traverses a dictionary and substitutes
             variables in fields, lists, and nested dictionaries
 
+        The Expression Statement extension "jinja2.ext.do", which enables
+            {% do ... %} statements.  These are useful for appending to lists.
+            e.g. {{ bar.append(foo) }} would print "None" to the parsed jinja
+            template, but {% do bar.append(foo) %} would not.
+
         Additionally, the following TemplateConstants are passed into the
         environment:
         DOLLAR_CURLY_BRACE
@@ -135,11 +140,14 @@ class Jinja:
         """
 
         env = jinja2.Environment(loader=loader, undefined=self.undefined)
-        env.extend(DOLLAR_CURLY_BRACE=TemplateConstants.DOLLAR_CURLY_BRACE,
-                   DOLLAR_PARENTHESES=TemplateConstants.DOLLAR_PARENTHESES,
-                   DOUBLE_CURLY_BRACES=TemplateConstants.DOUBLE_CURLY_BRACES,
-                   AT_SQUARE_BRACES=TemplateConstants.AT_SQUARE_BRACES,
-                   AT_ANGLE_BRACKETS=TemplateConstants.AT_ANGLE_BRACKETS)
+
+        env.globals["DOLLAR_CURLY_BRACE"] = TemplateConstants.DOLLAR_CURLY_BRACE
+        env.globals["DOLLAR_PARENTHESES"] = TemplateConstants.DOLLAR_PARENTHESES
+        env.globals["DOUBLE_CURLY_BRACES"] = TemplateConstants.DOUBLE_CURLY_BRACES
+        env.globals["AT_SQUARE_BRACES"] = TemplateConstants.AT_SQUARE_BRACES
+        env.globals["AT_ANGLE_BRACKETS"] = TemplateConstants.AT_ANGLE_BRACKETS
+
+        env.add_extension("jinja2.ext.do")
 
         env.filters["strftime"] = lambda dt, fmt: strftime(dt, fmt)
         env.filters["to_isotime"] = lambda dt: to_isotime(dt) if not isinstance(dt, SilentUndefined) else dt
@@ -163,7 +171,7 @@ class Jinja:
                 if not (isinstance(structure_to_substitute, SilentUndefined) or
                         isinstance(var_type, SilentUndefined) or
                         isinstance(get_value, SilentUndefined))
-                else structure_to_substitute if isinstance(structure_to_substitute, SlilentUndefined)
+                else structure_to_substitute if isinstance(structure_to_substitute, SilentUndefined)
                 else var_type if isinstance(var_type, SilentUndefined)
                 else get_value)
 
