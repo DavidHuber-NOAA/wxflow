@@ -6,7 +6,6 @@ from typing import Dict, List, Union
 import jinja2
 from markupsafe import Markup
 
-from .template import TemplateConstants, Template
 from .timetools import (add_to_datetime, strftime, to_fv3time, to_isotime,
                         to_julian, to_timedelta, to_YMD, to_YMDH)
 
@@ -111,21 +110,11 @@ class Jinja:
         getenv: read variable from environment if defined, else UNDEFINED
         to_timedelta: convert a string to a timedelta object
         add_to_datetime: add time to a datetime, return new datetime object
-        template_substitute_structure: traverses a dictionary and substitutes
-            variables in fields, lists, and nested dictionaries
 
         The Expression Statement extension "jinja2.ext.do", which enables
             {% do ... %} statements.  These are useful for appending to lists.
             e.g. {{ bar.append(foo) }} would print "None" to the parsed jinja
             template, but {% do bar.append(foo) %} would not.
-
-        Additionally, the following TemplateConstants are passed into the
-        environment:
-        DOLLAR_CURLY_BRACE
-        DOLLAR_PARENTHESES
-        DOUBLE_CURLY_BRACES
-        AT_SQUARE_BRACES
-        AT_ANGLE_BRACKETS
 
         Parameters
         ----------
@@ -140,12 +129,6 @@ class Jinja:
         """
 
         env = jinja2.Environment(loader=loader, undefined=self.undefined)
-
-        env.globals["DOLLAR_CURLY_BRACE"] = TemplateConstants.DOLLAR_CURLY_BRACE
-        env.globals["DOLLAR_PARENTHESES"] = TemplateConstants.DOLLAR_PARENTHESES
-        env.globals["DOUBLE_CURLY_BRACES"] = TemplateConstants.DOUBLE_CURLY_BRACES
-        env.globals["AT_SQUARE_BRACES"] = TemplateConstants.AT_SQUARE_BRACES
-        env.globals["AT_ANGLE_BRACKETS"] = TemplateConstants.AT_ANGLE_BRACKETS
 
         env.add_extension("jinja2.ext.do")
 
@@ -163,17 +146,6 @@ class Jinja:
                 if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined))
                 else dt if isinstance(dt, SilentUndefined) else delta)
         env.filters["to_timedelta"] = lambda delta_str: to_timedelta(delta_str) if not isinstance(delta_str, SilentUndefined) else delta_str
-        env.filters["template_substitute_structure"] = (
-                lambda structure_to_substitute, var_type, get_value:
-                Template.substitute_structure(structure_to_substitute,
-                                              var_type,
-                                              get_value)
-                if not (isinstance(structure_to_substitute, SilentUndefined) or
-                        isinstance(var_type, SilentUndefined) or
-                        isinstance(get_value, SilentUndefined))
-                else structure_to_substitute if isinstance(structure_to_substitute, SilentUndefined)
-                else var_type if isinstance(var_type, SilentUndefined)
-                else get_value)
 
         # Add any additional filters
         if filters is not None:
