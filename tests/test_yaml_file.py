@@ -61,6 +61,7 @@ def test_j2template_missing_var(tmp_path, create_template):
         data = {'current_cycle': datetime.now()}
         conf = parse_j2yaml(path=str(tmp_path / 'j2tmpl.yaml'), data=data, allow_missing=False)
 
+
 def test_yaml_file_with_j2templates(tmp_path, create_template):
 
     # Set env. variable
