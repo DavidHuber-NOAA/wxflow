@@ -156,7 +156,7 @@ def vanilla_yaml(ctx):
         return ctx
 
 
-def parse_j2yaml(path: str, data: Dict, searchpath: Union[str, List] = '/') -> Dict[str, Any]:
+def parse_j2yaml(path: str, data: Dict, searchpath: Union[str, List] = '/', allow_missing: bool = True) -> Dict[str, Any]:
     """
     Description
     -----------
@@ -171,6 +171,8 @@ def parse_j2yaml(path: str, data: Dict, searchpath: Union[str, List] = '/') -> D
         the context for jinja2 templating
     searchpath: str | List
         additional search paths for included jinja2 templates
+    allow_missing: bool
+        whether to allow missing variables in a jinja2 template or not
     Returns
     -------
     Dict[str, Any]
@@ -180,4 +182,4 @@ def parse_j2yaml(path: str, data: Dict, searchpath: Union[str, List] = '/') -> D
     if not os.path.exists(path):
         raise FileNotFoundError(f"Input j2yaml file {path} does not exist!")
 
-    return YAMLFile(data=Jinja(path, data, searchpath=searchpath).render)
+    return YAMLFile(data=Jinja(path, data, searchpath=searchpath, allow_missing=allow_missing).render)

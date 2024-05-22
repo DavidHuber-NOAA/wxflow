@@ -225,7 +225,7 @@ class Jinja:
         try:
             rendered = template.render(**self.data)
         except jinja2.UndefinedError as ee:
-            raise Exception(f"Undefined variable in Jinja2 template\n{ee}")
+            raise NameError(f"Undefined variable in Jinja2 template\n{ee}")
 
         return rendered
 

@@ -53,6 +53,14 @@ def test_yaml_file(tmp_path, create_template):
     assert yaml_in == conf
 
 
+def test_j2template_missing_var(tmp_path, create_template):
+
+    # Try to parse a j2yaml with an undefined variable (user)
+    os.environ['TMP_PATH'] = str(tmp_path)
+    with pytest.raises(NameError) as e_info:
+        data = {'current_cycle': datetime.now()}
+        conf = parse_j2yaml(path=str(tmp_path / 'j2tmpl.yaml'), data=data, allow_missing=False)
+
 def test_yaml_file_with_j2templates(tmp_path, create_template):
 
     # Set env. variable
