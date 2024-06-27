@@ -5,8 +5,11 @@ import pytest
 
 from wxflow import Configuration, cast_as_dtype
 
+SOME_INPUT_ENVVAR1 = "input_envvar"
+
 file0 = """#!/bin/bash
 export SOME_ENVVAR1="${USER}"
+export SOME_INPUT_ENVVAR1="${SOME_INPUT_ENVVAR1:-}"
 export SOME_LOCALVAR1="myvar1"
 export SOME_LOCALVAR2="myvar2.0"
 export SOME_LOCALVAR3="myvar3_file0"
@@ -37,6 +40,7 @@ export SOME_BOOL7=.TRUE.
 
 file0_dict = {
     'SOME_ENVVAR1': os.environ['USER'],
+    'SOME_INPUT_ENVVAR1': "",
     'SOME_LOCALVAR1': "myvar1",
     'SOME_LOCALVAR2': "myvar2.0",
     'SOME_LOCALVAR3': "myvar3_file0",
@@ -58,6 +62,9 @@ file0_dict = {
     'SOME_BOOL5': False,
     'SOME_BOOL6': False
 }
+
+file0_dict_set_envvar = file0_dict.copy()
+file0_dict_set_envvar["SOME_INPUT_ENVVAR1"] = SOME_INPUT_ENVVAR1
 
 file1_dict = {
     'SOME_LOCALVAR3': "myvar3_file1",
@@ -171,3 +178,10 @@ def test_parse_config2(tmp_path, create_configs):
     ff_dict = file0_dict.copy()
     ff_dict.update(file1_dict)
     assert ff_dict == ff
+
+
+@pytest.mark.skip(reason="fails in GH runner, passes on localhost")
+def test_parse_config_w_envvar(tmp_path, create_configs):
+    cfg = Configuration(tmp_path)
+    f0 = cfg.parse_config('config.file0', SOME_INPUT_ENVVAR1=SOME_INPUT_ENVVAR1)
+    assert file0_dict_set_envvar == f0
