@@ -1,5 +1,6 @@
 import os
 import sys
+from functools import reduce
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -110,6 +111,7 @@ class Jinja:
         getenv: read variable from environment if defined, else UNDEFINED
         to_timedelta: convert a string to a timedelta object
         add_to_datetime: add time to a datetime, return new datetime object
+        replace_tmpl: replace substrings of an input string with replacements specified by an input dictionary
 
         The Expression Statement extension "jinja2.ext.do", which enables
             {% do ... %} statements.  These are useful for appending to lists.
@@ -146,6 +148,7 @@ class Jinja:
                 if not (isinstance(dt, SilentUndefined) or isinstance(delta, SilentUndefined))
                 else dt if isinstance(dt, SilentUndefined) else delta)
         env.filters["to_timedelta"] = lambda delta_str: to_timedelta(delta_str) if not isinstance(delta_str, SilentUndefined) else delta_str
+        env.filters["replace_tmpl"] = lambda string, tmpl_dict: reduce(lambda ss, kk: ss.replace(kk, tmpl_dict[kk]), tmpl_dict, string)
 
         # Add any additional filters
         if filters is not None:

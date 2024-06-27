@@ -30,7 +30,7 @@ class Task:
         """
 
         # Store the config and arguments as attributes of the object
-        self.config = AttrDict(config)
+        self._config = AttrDict(config)
 
         for arg in args:
             setattr(self, str(arg), arg)
@@ -38,27 +38,21 @@ class Task:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        # Pull out basic runtime keys values from config into its own runtime config
-        self.runtime_config = AttrDict()
-        runtime_keys = ['PDY', 'cyc', 'DATA', 'RUN', 'CDUMP']  # TODO: eliminate CDUMP and use RUN instead
-        for kk in runtime_keys:
-            try:
-                self.runtime_config[kk] = config[kk]
-                logger.debug(f'Deleting runtime_key {kk} from config')
-                del self.config[kk]
-            except KeyError:
-                raise KeyError(f"Encountered an unreferenced runtime_key {kk} in 'config'")
+        # Create task_config with everything that is inside _config and whatever the user chooses to
+        # extend it with when initializing a child subclass of Task. Only task_config should be referenced
+        # in any application, not _config.
+        self.task_config = self._config.deepcopy()
 
         # Any other composite runtime variables that may be needed for the duration of the task
         # can be constructed here
 
         # Construct the current cycle datetime object
-        self.runtime_config['current_cycle'] = add_to_datetime(self.runtime_config['PDY'], to_timedelta(f"{self.runtime_config.cyc}H"))
-        logger.debug(f"current cycle: {self.runtime_config['current_cycle']}")
+        self.task_config['current_cycle'] = add_to_datetime(self._config['PDY'], to_timedelta(f"{self._config.cyc}H"))
+        logger.debug(f"current cycle: {self.task_config['current_cycle']}")
 
         # Construct the previous cycle datetime object
-        self.runtime_config['previous_cycle'] = add_to_datetime(self.runtime_config.current_cycle, -to_timedelta(f"{self.config['assim_freq']}H"))
-        logger.debug(f"previous cycle: {self.runtime_config['previous_cycle']}")
+        self.task_config['previous_cycle'] = add_to_datetime(self.task_config.current_cycle, -to_timedelta(f"{self._config['assim_freq']}H"))
+        logger.debug(f"previous cycle: {self.task_config['previous_cycle']}")
 
         pass
 

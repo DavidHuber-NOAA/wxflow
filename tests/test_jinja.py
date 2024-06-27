@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import jinja2
 import pytest
 
 from wxflow import Jinja, to_isotime
@@ -29,6 +30,12 @@ def test_render_stream():
     j = Jinja(j2tmpl, data, allow_missing=False)
     assert j.render == f"Hello Jane! How are you? It is: {to_isotime(current_date)}"
 
+    tmpl_dict = {"{{ name }}": "Jane", "{{ greeting }}": "How are you?", "{{ current_date | to_isotime }}": to_isotime(current_date)}
+    j = Jinja(j2tmpl, data, allow_missing=False)
+    loader = jinja2.BaseLoader()
+    env = j.get_set_env(loader)
+    assert env.filters['replace_tmpl'](j2tmpl, tmpl_dict) == f"Hello Jane! How are you? It is: {to_isotime(current_date)}"
+
 
 def test_render_file(tmp_path, create_template):
 
@@ -40,6 +47,12 @@ def test_render_file(tmp_path, create_template):
     data = {"name": "Jane", "greeting": "How are you?", "current_date": current_date}
     j = Jinja(str(file_path), data, allow_missing=False)
     assert j.render == f"Hello Jane! How are you? It is: {to_isotime(current_date)}"
+
+    tmpl_dict = {"{{ name }}": "Jane", "{{ greeting }}": "How are you?", "{{ current_date | to_isotime }}": to_isotime(current_date)}
+    j = Jinja(str(file_path), data, allow_missing=False)
+    loader = jinja2.BaseLoader()
+    env = j.get_set_env(loader)
+    assert env.filters['replace_tmpl'](j2tmpl, tmpl_dict) == f"Hello Jane! How are you? It is: {to_isotime(current_date)}"
 
 
 def test_include(tmp_path, create_template):
