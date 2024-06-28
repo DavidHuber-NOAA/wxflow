@@ -40,7 +40,7 @@ class Task:
 
         # Pull out basic runtime keys values from config into its own runtime config
         self.runtime_config = AttrDict()
-        runtime_keys = ['PDY', 'cyc', 'DATA', 'RUN', 'CDUMP']  # TODO: eliminate CDUMP and use RUN instead
+        runtime_keys = ['PDY', 'cyc', 'DATA', 'RUN']
         for kk in runtime_keys:
             try:
                 self.runtime_config[kk] = config[kk]
