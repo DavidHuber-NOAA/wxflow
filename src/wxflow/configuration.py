@@ -66,20 +66,26 @@ class Configuration:
         raise UnknownConfigError(
             f'{config_name} does not exist (known: {repr(config_name)}), ABORT!')
 
-    def parse_config(self, files: Union[str, bytes, list]) -> Dict[str, Any]:
+    def parse_config(self, files: Union[str, bytes, list], **envvars) -> Dict[str, Any]:
         """
         Given the name of config file(s), key-value pair of all variables in the config file(s)
         are returned as a dictionary
+
         :param files: config file or list of config files
         :type files: list or str or unicode
+
+        :param envvars: environment variables to be set prior to sourcing config files
+        :type envvars: Any
+
         :return: Key value pairs representing the environment variables defined
-                in the script.
+                 in the script.
         :rtype: dict
         """
         if isinstance(files, (str, bytes)):
             files = [files]
         files = [self.find_config(file) for file in files]
-        return cast_strdict_as_dtypedict(self._get_script_env(files))
+
+        return cast_strdict_as_dtypedict(self._get_script_env(files, **envvars))
 
     def print_config(self, files: Union[str, bytes, list]) -> None:
         """
@@ -93,18 +99,22 @@ class Configuration:
         pprint(config, width=4)
 
     @classmethod
-    def _get_script_env(cls, scripts: List) -> Dict[str, Any]:
+    def _get_script_env(cls, scripts: List, **envvars) -> Dict[str, Any]:
         default_env = cls._get_shell_env([])
-        and_script_env = cls._get_shell_env(scripts)
+        and_script_env = cls._get_shell_env(scripts, **envvars)
         vars_just_in_script = set(and_script_env) - set(default_env)
         union_env = dict(default_env)
         union_env.update(and_script_env)
         return dict([(v, union_env[v]) for v in vars_just_in_script])
 
     @staticmethod
-    def _get_shell_env(scripts: List) -> Dict[str, Any]:
+    def _get_shell_env(scripts: List, **envvars) -> Dict[str, Any]:
         varbls = dict()
-        runme = ''.join([f'source {s} ; ' for s in scripts])
+        runme = ''
+        if envvars:
+            runme += '; '.join([f'export {key}={value}' for key, value in envvars.items()])
+            runme += '; '
+        runme += ''.join([f'source {s}; ' for s in scripts])
         magic = f'--- ENVIRONMENT BEGIN {random.randint(0,64**5)} ---'
         runme += f'/bin/echo -n "{magic}" ; /usr/bin/env -0'
         with open('/dev/null', 'w') as null:
