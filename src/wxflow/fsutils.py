@@ -36,7 +36,7 @@ def rmdir(dir_path, missing_ok=False):
             raise exc
 
     except OSError:
-        raise OSError(f"unable to remove {dir_path}")
+        raise OSError(f"Unable to remove the target directory: {dir_path}")
 
 
 @contextmanager
