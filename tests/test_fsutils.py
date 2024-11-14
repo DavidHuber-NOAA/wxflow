@@ -63,8 +63,13 @@ def test_chdir(tmp_path):
     # Make the directory and navigate to it
     mkdir(dir_path)
 
+    # Get the CWD to verify that we come back after the with.
+    cwd = os.getcwd()
+
     with chdir(dir_path):
         assert os.getcwd() == os.path.abspath(dir_path)
+
+    assert os.getcwd() == cwd
 
     # Now try to go somewhere that doesn't exist
     with pytest.raises(OSError):
