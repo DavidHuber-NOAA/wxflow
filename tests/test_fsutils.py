@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from wxflow import mkdir, rmdir, chdir, rm_p, cp, get_gid
+from wxflow import chdir, cp, get_gid, mkdir, rm_p, rmdir
 
 
 def test_mkdir(tmp_path):

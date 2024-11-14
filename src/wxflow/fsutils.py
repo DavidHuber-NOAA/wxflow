@@ -1,8 +1,8 @@
-from contextlib import contextmanager
-from logging import getLogger
 import grp
 import os
 import shutil
+from contextlib import contextmanager
+from logging import getLogger
 
 __all__ = ['mkdir', 'mkdir_p', 'rmdir', 'chdir', 'rm_p', 'cp',
            'get_gid', 'chgrp']
