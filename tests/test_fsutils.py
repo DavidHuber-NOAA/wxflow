@@ -38,17 +38,17 @@ def test_rmdir(tmp_path):
     dir_path = tmp_path / 'my_input_dir'
     # Make and then delete the directory
     mkdir(dir_path)
-    rmdir(dir_path, missing_ok=False)
+    rmdir(dir_path)
 
     # Assert that it was deleted
     assert not os.path.exists(dir_path)
 
     # Attempt to delete a non-existent path and ignore that it is missing
-    rmdir('/non-existent-path')
+    rmdir('/non-existent-path', missing_ok=True)
 
     # Lastly, attempt to delete a non-existent directory and do not ignore the error
     with pytest.raises(FileNotFoundError):
-        rmdir('/non-existent-path', missing_ok=False)
+        rmdir('/non-existent-path')
 
 
 def test_chdir(tmp_path):

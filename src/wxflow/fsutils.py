@@ -20,7 +20,7 @@ def mkdir_p(path):
 mkdir = mkdir_p
 
 
-def rmdir(dir_path, missing_ok=True):
+def rmdir(dir_path, missing_ok=False):
     """
     Attempt to delete a directory and all of its contents.
     If ignore_missing is True, then a missing directory will not raise an error.
