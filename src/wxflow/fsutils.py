@@ -29,11 +29,11 @@ def rmdir(dir_path, missing_ok=False):
     try:
         shutil.rmtree(dir_path)
 
-    except FileNotFoundError as exc:
+    except FileNotFoundError:
         if missing_ok:
             logger.warning(f"WARNING cannot remove the target path {dir_path} because it does not exist")
         else:
-            raise exc
+            raise FileNotFoundError(f"Target directory ({dir_path}) cannot be removed because it does not exist")
 
     except OSError:
         raise OSError(f"Unable to remove the target directory: {dir_path}")
