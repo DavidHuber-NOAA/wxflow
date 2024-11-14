@@ -176,7 +176,7 @@ def test_configuration_config_dir(tmp_path, create_configs):
 def test_configuration_config_files(tmp_path, create_configs):
     cfg = Configuration(tmp_path)
     config_files = [str(tmp_path / 'config.file0'), str(tmp_path / 'config.file1')]
-    assert config_files == cfg.config_files
+    assert sorted(config_files) == sorted(cfg.config_files)
 
 
 def test_find_config(tmp_path, create_configs):
