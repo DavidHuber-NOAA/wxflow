@@ -76,6 +76,15 @@ def test_chdir(tmp_path):
         with chdir("/a/non-existent/path"):
             raise AssertionError("Navigated to a non-existent path")
 
+    # Lastly, test that we return to the orignial working directory when there is an error
+    try:
+        with chdir(dir_path):
+            1 / 0
+    except ZeroDivisionError:
+        pass
+
+    assert os.getcwd() == cwd
+
 
 def test_rm_p(tmp_path):
     """
