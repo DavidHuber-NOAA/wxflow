@@ -188,7 +188,7 @@ def cast_as_dtype(string: str) -> Union[str, int, float, bool, Any]:
 
     try:
         return to_datetime(string)  # Try as a datetime
-    except Exception as exc:
+    except Exception:
         if string in BOOLS:  # Likely a boolean, convert to True/False
             return _true_or_not(string)
         elif '.' in string:  # Likely a number and that too a float

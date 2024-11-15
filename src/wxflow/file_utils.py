@@ -86,7 +86,7 @@ class FileHandler:
                     logger.info(f'Copied {src} to {dest}')
                 except Exception as ee:
                     logger.exception(f"Error copying {src} to {dest}")
-                    raise ee(f"Error copying {src} to {dest}")
+                    raise OSError(str(ee), f"\nError copying {src} to {dest}")
             else:
                 if required:
                     logger.exception(f"Source file '{src}' does not exist and is required, ABORT!")
@@ -109,4 +109,4 @@ class FileHandler:
                 logger.info(f'Created {dd}')
             except Exception as ee:
                 logger.exception(f"Error creating directory {dd}")
-                raise ee(f"Error creating directory {dd}")
+                raise OSError(str(ee), f"\nError creating directory {dd}")

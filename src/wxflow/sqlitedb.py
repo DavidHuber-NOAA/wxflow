@@ -35,10 +35,7 @@ class SQLiteDB:
 
         """
 
-        try:
-            self.connection = sqlite3.connect(self.db_name)
-        except sqlite3.OperationalError as exc:
-            raise sqlite3.OperationalError(exc)
+        self.connection = sqlite3.connect(self.db_name)
 
     def disconnect(self) -> None:
         """
@@ -116,7 +113,7 @@ class SQLiteDB:
             columns = [column[1] for column in cursor.fetchall()]
             if column_name not in columns:
                 raise ValueError(f"Column '{column_name}' does not exist in table '{table_name}'")
-            raise sqlite3.OperationalError(exc)
+            raise sqlite3.OperationalError(str(exc))
 
     def update_data(
         self,
