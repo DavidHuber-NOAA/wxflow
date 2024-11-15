@@ -107,13 +107,13 @@ class SQLiteDB:
         try:
             query = f"ALTER TABLE {table_name} DROP COLUMN {column_name}"
             self.execute_query(query)
-        except sqlite3.OperationalError as exc:
+        except sqlite3.OperationalError:
             query = f"PRAGMA table_info({table_name})"
             cursor = self.execute_query(query)
             columns = [column[1] for column in cursor.fetchall()]
             if column_name not in columns:
                 raise ValueError(f"Column '{column_name}' does not exist in table '{table_name}'")
-            raise sqlite3.OperationalError(str(exc))
+            raise sqlite3.OperationalError("An unknown SQL error occurred")
 
     def update_data(
         self,
