@@ -56,7 +56,7 @@ def test_remove_column(db):
     column_name = "address"
     db.remove_column("test_table", column_name)
 
-    # Verify that the column exists in the test table
+    # Verify that the column no longer exists in the test table
     assert not column_exists(db, "test_table", column_name)
 
 
