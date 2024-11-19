@@ -1,6 +1,6 @@
 import sqlite3
-from typing import Any, List, Optional, Tuple
 from logging import getLogger
+from typing import Any, List, Optional, Tuple
 
 __all__ = ["SQLiteDB"]
 
