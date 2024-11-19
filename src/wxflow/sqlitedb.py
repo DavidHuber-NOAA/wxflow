@@ -1,7 +1,10 @@
 import sqlite3
 from typing import Any, List, Optional, Tuple
+from logging import getLogger
 
 __all__ = ["SQLiteDB"]
+
+logger = getLogger(__name__.split('.')[-1])
 
 
 class SQLiteDBError(Exception):
@@ -107,13 +110,14 @@ class SQLiteDB:
         try:
             query = f"ALTER TABLE {table_name} DROP COLUMN {column_name}"
             self.execute_query(query)
-        except sqlite3.OperationalError:
+        except sqlite3.OperationalError as ee:
             query = f"PRAGMA table_info({table_name})"
             cursor = self.execute_query(query)
             columns = [column[1] for column in cursor.fetchall()]
             if column_name not in columns:
                 raise ValueError(f"Column '{column_name}' does not exist in table '{table_name}'")
-            raise sqlite3.OperationalError("An unknown SQL error occurred")
+            logger.exception(f"Failed to remove '{column_name}' from '{table_name}' due to an unknown error.")
+            raise ee
 
     def update_data(
         self,

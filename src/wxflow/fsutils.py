@@ -108,7 +108,10 @@ def cp(source: str, target: str) -> None:
     try:
         shutil.copy2(source, target)
     except OSError:
-        raise OSError(f"unable to copy {source} to {target}")
+        raise OSError(f"Unable to copy {source} to {target}")
+    except Exception as ee:
+        logger.exception(f"An unknown error occurred while copying {source} to {target}")
+        raise ee
 
 
 # Group ID number for a given group name
